@@ -1,0 +1,18 @@
+{
+  "name": "cross-domain-localstorage",
+  "version": "1.0.0",
+  "description": "Test setup to figure out how cross domain localstorage works",
+  "main": "src/server1.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon src/index.js"
+  },
+  "author": "Nolemmings",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.14.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.11.0"
+  }
+}

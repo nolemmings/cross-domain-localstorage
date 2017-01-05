@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Server 2</title>
+<link href="/main.css" rel="stylesheet" type="text/css">
+<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha256-/SIrNqv8h6QGKDuNoLGA4iret+kyesCkHGzVUUV0shc=" crossorigin="anonymous"></script>
+<script src="/shared.js"></script>
+
+<script>
+function sendMessage(message) {
+  console.log('SEND to server1', message)
+  window.parent.postMessage(message, '*');
+};
+
+function sendReply(reply) {
+  sendMessage(JSON.stringify({
+    action: 'receiveReply',
+    data: {
+      key: $('input[name="key"]').val(),
+      value: $('input[name="value"]').val(),
+    },
+  }));
+}
+
+function receiveMessage(event) {
+  console.log('RECEIVE server2 from', event.origin, 'data', event.data)
+  if (event.origin !== 'http://localhost:5000') {
+    return;
+  }
+  var payload = JSON.parse(event.data);
+
+  switch (payload.action) {
+    case 'setLocalStorage':
+      setLocalStorage(payload.data.key, payload.data.value);
+      break;
+    case 'sendReply':
+      sendReply()
+      break;
+    default:
+      throw new Error('Unknown action', payload.action)
+  }
+};
+
+window.addEventListener('message', receiveMessage, false);
+</script>
+
+<style>
+body {
+  background-color: #eee;
+}
+</style>
+</head>
+<body>
+
+    <h1>Server 2</h1>
+
+    <p>
+      <button onclick="clearLocalStorage()">Clear local storage</button>
+    </p>
+
+    <h2>Local Storage</h2>
+
+    <table id="localstorage-table">
+      <thead>
+        <tr>
+          <th>Key</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Server 1</title>
+<link href="/main.css" rel="stylesheet" type="text/css">
+<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha256-/SIrNqv8h6QGKDuNoLGA4iret+kyesCkHGzVUUV0shc=" crossorigin="anonymous"></script>
+<script src="/shared.js"></script>
+
+<script>
+function clearInput() {
+  $('input[name="key"]').val('');
+  $('input[name="value"]').val('');
+}
+
+function server1() {
+  setLocalStorage($('input[name="key"]').val(), $('input[name="value"]').val())
+  clearInput();
+}
+
+function sendMessage(message) {
+  console.log('SEND to server2', message)
+  var win = document.getElementsByTagName('iframe')[0].contentWindow;
+  win.postMessage(message, '*');
+};
+
+function server2localstorage() {
+  sendMessage(JSON.stringify({
+    action: 'setLocalStorage',
+    data: {
+      key: $('input[name="key"]').val(),
+      value: $('input[name="value"]').val(),
+    },
+  }));
+  clearInput();
+}
+
+function server2reply() {
+  sendMessage(JSON.stringify({
+    action: 'sendReply',
+    data: {
+      reply: 'Test',
+    },
+  }));
+}
+
+function receiveMessage(event) {
+  console.log('RECEIVE server1 from', event.origin, 'data', event.data)
+  if (event.origin !== 'http://localhost:5001') {
+    return;
+  }
+};
+
+window.addEventListener('message', receiveMessage, false);
+</script>
+
+</head>
+
+<style>
+iframe {
+  margin-top: 30px;
+}
+</style>
+<body>
+
+<h1>Server 1</h1>
+
+<p>
+  <input type="text" name="key" placeholder="Key" />
+  <input type="text" name="value" placeholder="Value" />
+  <button onclick="server1()">Server 1</button>
+  <button onclick="server2localstorage()">Server 2</button>
+</p>
+
+<p>
+  <button onclick="clearLocalStorage()">Clear local storage</button>
+  <button onclick="server2reply()">Let server 2 send a reply</button>
+</p>
+
+<h2>Local Storage</h2>
+
+<table id="localstorage-table">
+  <thead>
+    <tr>
+      <th>Key</th>
+      <th>Value</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<iframe src="http://localhost:5001" height="500" width="700"></iframe>
+
+</body>
+</html>
